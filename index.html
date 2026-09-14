@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LUNARIS Terminal - Architecture Whitepaper</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">LUNARIS Terminal - Architecture Whitepaper</h1>
+</header>
+<p><img src="media/ca60c53f0369d97a2e792d8c65de19f75d126013.png"
+style="width:1in;height:1in" /></p>
+<p><strong>ARCHITECTURE WHITEPAPER</strong></p>
+<p>BITGET AI BASE CAMP HACKATHON — SEASON 2</p>
+<p><strong>LUNARIS</strong></p>
+<p><strong>TERMINAL</strong></p>
+<p><em>Beyond “AI Slop”: Designing an Adversarial, Multi-Agent
+Autonomous</em></p>
+<p><em>Trading System with Deterministic Risk Hard-Guards and
+Merkle-Verified Auditability</em></p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><p><strong>PROJECT</strong></p>
+<p><strong>Lunaris Terminal — AI x Tokenized US Stock &amp; Crypto
+Trading Desk</strong></p>
+<p>Live app: https://lunaristerminal.vercel.app/</p>
+<p>Author: Joezzy (@JoezzyWeb3) • joezzyweb3@gmail.com</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Contents</strong></p>
+<p><strong>Executive Abstract</strong></p>
+<p>The generative AI boom has flooded decentralized finance and
+algorithmic trading with superficial wrappers — often termed “AI slop.”
+These applications typically connect a raw Large Language Model (LLM) to
+a single prompt, ask it for price predictions, and execute trades
+without structural risk boundaries, adversarial critique, or
+cryptographic auditability. When markets suffer regime shifts or
+liquidity shocks, these unconstrained systems fail catastrophically due
+to sycophancy, stochastic drift, and unmitigated hallucinations.</p>
+<p>LUNARIS Terminal is an architectural antidote to this paradigm.
+Engineered for cross-asset deployment across spot crypto (Bitget) and
+mega-cap tech equities, LUNARIS replaces the vulnerable single-model
+prompt with an asynchronous, multi-agent cognitive architecture,
+governed by deterministic execution gates that no generative model can
+override.</p>
+<p>This whitepaper details the architectural philosophy, technical
+implementation, and security models that separate LUNARIS from
+conventional AI financial prototypes.</p>
+<p><strong>1. The Problem Space: Why Generative AI Fails in Financial
+Markets</strong></p>
+<p><strong>1.1 The Pitfalls of Single-Agent LLM Trading (“AI
+Slop”)</strong></p>
+<p>Traditional “AI trading bots” suffer from four critical architectural
+defects:</p>
+<ul>
+<li><p><strong>Sycophancy &amp; Confirmation Bias:</strong> LLMs
+naturally optimize for helpfulness and narrative consistency. If
+prompted with bullish signals, they rationalize long positions while
+ignoring countervailing downside indicators.</p></li>
+<li><p><strong>Hallucination Under High Volatility:</strong> In
+black-swan scenarios (e.g., flash crashes, de-pegs, exchange outages),
+LLMs extrapolate fictional price floors or recommend buying into
+catastrophic drawdowns.</p></li>
+<li><p><strong>Absence of Hard Invariants:</strong> Giving an LLM direct
+API access to order sizing allows stochastic token generation to dictate
+capital allocation — a fatal flaw when a prompt injection or parsing
+error produces an outsized position.</p></li>
+<li><p><strong>Opaque, Unauditable Execution:</strong> Most systems lack
+verifiable logs, obscuring whether paper-traded returns stem from
+real-time market data or retroactive in-memory fabrication.</p></li>
+</ul>
+<p><strong>2. Core Architectural Philosophy: The Separation of
+Intelligence and Authority</strong></p>
+<p>The fundamental thesis of LUNARIS is that generative models should
+advise, but only mathematical invariants may execute.</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td
+style="text-align: center;"><p>╔════════════════════════════════════════════════════╗</p>
+<p>║ L U N A R I S T E R M I N A L A R C H I T E C T U R E ║</p>
+<p>╚════════════════════════════════════════════════════╝</p>
+<p>[ Live Data Ingestion: Bitget &amp; AlphaVantage ]</p>
+<p>│</p>
+<p>▼</p>
+<p>┌─ LAYER 1 ─ Perception &amp; Pulse Radar
+──────────────────────────────┐</p>
+<p>│ Social Sentiment · Liquidity Order Books · Volatility │</p>
+<p>└────────────────────────────────────────────────────────────────┘</p>
+<p>│</p>
+<p>▼</p>
+<p>┌─ LAYER 2 ─ Asynchronous Debate Council
+─────────────────────────────┐</p>
+<p>│ AURA (Quant) · CYPHER (Guardian) │</p>
+<p>│ VALKYRIE (Macro) · NEXUS-RED (Adversary) │</p>
+<p>└────────────────────────────────────────────────────────────────┘</p>
+<p>Thesis &amp; Sizing │</p>
+<p>▼</p>
+<p>╔═ LAYER 3 ─ Deterministic Risk Veto Engine ──────────────────╗</p>
+<p>║ (Non-Generative TypeScript Core) ║</p>
+<p>║ • Hard 25% Portfolio Allocation Cap ║</p>
+<p>║ • 10% Inflexible Stop-Loss Cut ║</p>
+<p>║ • Maximum 3 Concurrent Open Positions ║</p>
+<p>║ • Hardware Kill-Switch Override ║</p>
+<p>╚════════════════════════════════════════════════════════╝</p>
+<p>Approved / Vetoed Payload │</p>
+<p>▼</p>
+<p>┌─ LAYER 4 ─ Execution &amp; Dual-Tier Ledger
+─────────────────────┐</p>
+<p>│ Bitget BYOK / Paper Daemon · Disk Ledger (JSON) │</p>
+<p>│ SHA-256 Merkle Verification · Firestore Quota Breaker │</p>
+<p>└──────────────────────────────────────────────────────────┘</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>3. Deep Dive into System Layers</strong></p>
+<p><strong>3.1 Layer 1: Multi-Modal Ingestion &amp; Pulse
+Radar</strong></p>
+<p>Before any trading thesis is formed, LUNARIS aggregates multi-source
+telemetry:</p>
+<ul>
+<li><p><strong>Level-2 Depth Order Books:</strong> Real-time bid/ask
+pressure, depth imbalance, and spread dynamics across Bitget pairs (BTC,
+ETH, SOL) and equity benchmarks (NVDA, TSLA, AAPL).</p></li>
+<li><p><strong>Social &amp; Volume Pulse Radar:</strong> Ingests social
+sentiment velocity, institutional order flow patterns, and 24-hour
+volume changes to evaluate whether price action is driven by organic
+spot accumulation or speculative derivatives leverage.</p></li>
+</ul>
+<p><strong>3.2 Layer 2: The Four-Persona Adversarial Debate
+Council</strong></p>
+<p>Instead of querying a single prompt, LUNARIS convenes a structured
+quorum modeled after institutional investment committees. The council
+consists of four specialized personas:</p>
+<ul>
+<li><p><strong>Aura (Lead Quantitative Strategist):</strong> Evaluates
+technical indicators (EMA crossovers, RSI extremes, Bollinger Band
+squeezes, and Order Book Volume Imbalance). Seeks asymmetric risk/reward
+setups.</p></li>
+<li><p><strong>Cypher (Capital Guardian &amp; Risk Officer):</strong>
+Scrutinizes leverage, portfolio exposure, correlation clustering, and
+cash drag. Champions capital preservation above all else.</p></li>
+<li><p><strong>Valkyrie (Macro &amp; Geopolitical Analyst):</strong>
+Integrates central bank liquidity cycles, Treasury yields, cross-asset
+correlations (e.g., BTC/NVDA coupling), and macro volatility
+regimes.</p></li>
+<li><p><strong>Nexus-Red (The Red Team Adversary):</strong> The system's
+primary defense against sycophancy. Its explicit directive is to find
+flaws in Aura's thesis — constructing worst-case scenarios, liquidity
+dry-ups, regulatory intervention vectors, and bear traps.</p></li>
+</ul>
+<p><strong>Quorum Consensus Protocol</strong></p>
+<p>A trade cannot reach the execution pipeline without a supermajority
+score from the council. If Nexus-Red surfaces an unhedged liquidation
+risk or macro catalyst that Cypher validates, the proposal is rejected
+before it ever reaches the order desk.</p>
+<p><strong>COUNCIL DELIBERATION OUTPUT</strong></p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><p>// Architectural Flow: The Council Deliberation Output</p>
+<p>interface CouncilQuorumOutcome {</p>
+<p>consensusScore: number; // 0 to 100%</p>
+<p>recommendedAction: 'BUY' | 'SELL' | 'HOLD';</p>
+<p>targetAllocationPct: number; // Proposed by AI (subject to Layer 3
+veto)</p>
+<p>dissentingArguments: string[]; // Documented risks surfaced by
+Nexus-Red</p>
+<p>quorumApproved: boolean;</p>
+<p>}</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>3.3 Layer 3: The Deterministic Risk Veto Engine</strong></p>
+<p>Even when the AI Council achieves a 100% unanimous consensus, it
+possesses zero authority to execute directly. The proposal must pass
+through a strict mathematical filter implemented in pure, non-generative
+TypeScript (lib/riskVeto.ts):</p>
+<ul>
+<li><p><strong>The 25% Allocation Ceiling:</strong> Even if the AI
+proposes deploying 50% of available capital, the veto engine
+automatically clamps the trade to 25% max allocation.</p></li>
+<li><p><strong>Non-Negotiable Stop-Loss (10%):</strong> All open
+positions carry an automated, deterministic stop-loss trigger. The AI is
+not consulted when a stop-loss is triggered — the execution daemon
+liquidates the position unconditionally.</p></li>
+<li><p><strong>Maximum Concurrent Positions Limit:</strong> Clamped to a
+maximum of 3 concurrent open positions to prevent cross-asset
+correlation contagion.</p></li>
+<li><p><strong>Deterministic Kill Switch:</strong> A persistent
+emergency circuit breaker capable of instantly freezing autonomous
+execution, cancelling pending queue entries, and offloading open
+risk.</p></li>
+</ul>
+<p><strong>3.4 Layer 4: Execution, Dual-Tier Persistence &amp;
+Cryptographic Merkle Proofs</strong></p>
+<p>To guarantee institutional credibility, LUNARIS implements a
+resilient, multi-tiered persistence and auditing layer:</p>
+<ul>
+<li><p><strong>Bitget BYOK (Bring Your Own Keys) Integration:</strong>
+Users can toggle between verified sandbox/paper trading and live Bitget
+API execution with localized credential encryption.</p></li>
+<li><p><strong>Dual-Tier Server Ledger:</strong> Trade histories are
+maintained on persistent server storage (data/audit_trades.json and
+data/autopilot_state.json), ensuring state survival across server
+cold-starts and container migrations.</p></li>
+<li><p><strong>Firestore Quota Circuit Breaker:</strong> To insulate
+against free-tier API exhaustion (e.g., Spark plan write caps), LUNARIS
+incorporates an intelligent circuit breaker with local storage
+persistence and automated write-batching, preventing network stalls
+while continuing real-time audits.</p></li>
+</ul>
+<p><strong>Cryptographic Trade Proofs (SHA-256 Merkle
+Roots)</strong></p>
+<p>Every executed trade generates a deterministic hash calculated over
+its immutable parameters. Auditors and judges can inspect the input
+string and recalculate the SHA-256 digest in real time to verify that
+past returns are mathematically tamper-evident.</p>
+<p><strong>4. UI/UX Design System: The Industrial
+Cyber-Aesthetic</strong></p>
+<p>LUNARIS rejects the generic “SaaS template” aesthetic — purple
+gradients, generic drop shadows, and center-aligned marketing copy — in
+favor of a specialized mission-control trading console.</p>
+<ul>
+<li><p><strong>Typographic Hierarchy:</strong> Monospaced tabular data
+(JetBrains Mono / Space Grotesk styling) ensures alignment of financial
+figures, execution deltas, and timestamp micro-seconds.</p></li>
+<li><p><strong>Palette Logic:</strong> High-contrast dark canvas
+(#08090C, #0C0E14) paired with high-contrast functional color-coding,
+detailed below.</p></li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 9%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th><strong>Signal Color</strong></th>
+<th></th>
+<th><strong>Semantic Role</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>#00F0FF Cyan</strong></td>
+<td></td>
+<td>Quant algorithms, market data streams, active telemetry</td>
+</tr>
+<tr>
+<td><strong>#10B981 Emerald</strong></td>
+<td></td>
+<td>Reconciled profits, quorum BUY consensus, validated signatures</td>
+</tr>
+<tr>
+<td><strong>#F43F5E Rose / Crimson</strong></td>
+<td></td>
+<td>Stop-loss triggers, Nexus-Red adversarial critiques, risk
+vetoes</td>
+</tr>
+<tr>
+<td><strong>#F59E0B Amber</strong></td>
+<td></td>
+<td>Circuit breakers, quota mitigations, liquidity depth warnings</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p><strong>Real-Time Visual Components:</strong> Interactive
+Liquidity Depth Heatmaps, 3D WebGL Wireframe Visualizers, Dynamic
+Candlestick Canvas charts with live volume profiles, and a real-time
+Audit Deck.</p></li>
+</ul>
+<p><strong>5. Comparative Evaluation: Conventional Bot vs.
+LUNARIS</strong></p>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th><strong>Dimension</strong></th>
+<th><strong>Typical AI Trading Bot (“AI Slop”)</strong></th>
+<th><strong>LUNARIS Terminal</strong></th>
+</tr>
+<tr>
+<th><strong>Cognitive Architecture</strong></th>
+<th>Single prompt (“Predict tomorrow's price”)</th>
+<th>4-Persona Quorum with active Red-Team adversary</th>
+</tr>
+<tr>
+<th><strong>Risk Containment</strong></th>
+<th>LLM decides order sizing; prone to hallucination</th>
+<th>Non-overridable deterministic risk veto engine</th>
+</tr>
+<tr>
+<th><strong>Sycophancy Mitigation</strong></th>
+<th>None; model conforms to user prompt bias</th>
+<th>Dedicated adversarial persona (Nexus-Red)</th>
+</tr>
+<tr>
+<th><strong>Auditability</strong></th>
+<th>Ephemeral, opaque, in-memory arrays</th>
+<th>SHA-256 Merkle root verification &amp; server ledger</th>
+</tr>
+<tr>
+<th><strong>Infrastructure Resilience</strong></th>
+<th>Fails on API rate limits or quota drops</th>
+<th>Dual-tier fallback with persistent circuit breaker</th>
+</tr>
+<tr>
+<th><strong>Exchange Integration</strong></th>
+<th>Mock data or unverified API stubs</th>
+<th>Production Bitget BYOK sandbox &amp; live endpoints</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p><strong>6. Real-World Applications &amp; Future Horizons</strong></p>
+<ul>
+<li><p><strong>Autonomous Hedge Desk Execution:</strong> Operating as an
+automated scout that detects cross-asset divergences (e.g., tech equity
+rallies preceding crypto liquidity expansion) and drafts risk-vetted
+proposals for human review.</p></li>
+<li><p><strong>Auditable Quantitative Paper-Trading:</strong> Providing
+students, quantitative researchers, and retail traders with a
+zero-capital simulation environment with cryptographic
+integrity.</p></li>
+<li><p><strong>On-Chain DAO Treasury Risk Management:</strong> Applying
+the multi-agent council protocol to on-chain multisig transactions,
+where adversarial agents debate treasury allocations before funds are
+deployed.</p></li>
+</ul>
+<p><strong>7. Conclusion</strong></p>
+<p>LUNARIS Terminal proves that autonomous AI in quantitative finance
+does not have to be an unpredictable black box. By pairing adversarial
+multi-agent intelligence with inflexible deterministic mathematical
+gates, LUNARIS delivers an autonomous trading architecture that remains
+disciplined, transparent, and resilient even during severe market
+stress.</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><p><strong>PROJECT LINKS</strong></p>
+<p>Live application:
+<strong>https://lunaristerminal.vercel.app/</strong></p>
+<p>Contact: joezzyweb3@gmail.com • @JoezzyWeb3</p></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
